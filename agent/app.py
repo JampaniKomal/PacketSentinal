@@ -190,7 +190,7 @@ def save_logs():
     headers = ["id", "timestamp", "src_ip", "dst_ip", "protocol", "action", "reason"]
     log_list = [dict(zip(headers, log)) for log in logs]
     return Response(json.dumps(log_list, indent=2), mimetype='application/json',
-                    headers={'Content-Disposition': 'attachment;filename=siem_logs.json'})
+                    headers={'Content-Disposition': 'attachment;filename=packetsentinel_logs.json'})
 
 if __name__ == '__main__':
     reset_database()
