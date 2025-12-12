@@ -89,3 +89,8 @@ Here’s how to use the controls on the dashboard:
 - **Stop Button (⏹️):** Pauses the packet capture.
 - **Clear Button (🗑️):** Deletes all logs from the current session, both from the database and the UI.
 - **Save Button (💾):** Downloads all logs from the current session as a `siem_logs.json` file.
+
+## Future Roadmap
+- [ ] **Data Persistence:** Migrate to Elasticsearch/SQLite for long-term log storage.
+- [ ] **Threat Intelligence:** Integrate real-time threat feeds (AlienVault OTX).
+- [ ] **Web Dashboard:** Replace console output with a Flask/React dashboard for visualization.
