@@ -5,13 +5,14 @@ from scapy.all import sniff, get_if_list
 import json
 import sqlite3
 import os
+import secrets
 
 from analyzer import handle_packet
 from log_writer import init_db, get_stats_by_column, get_top_stats, get_events_by_time, fetch_all_logs
 
 # --- App, SocketIO, and Lock Initialization ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-very-secret-key'
+app.config['SECRET_KEY'] = secrets.token_hex(32)
 socketio = SocketIO(app, async_mode='threading')
 rules_lock = Lock() # To prevent race conditions when reading/writing rules.json
 
@@ -194,4 +195,8 @@ def save_logs():
 
 if __name__ == '__main__':
     reset_database()
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    # Bound to localhost only: this dashboard has no authentication, and the
+    # sniffer runs with elevated privileges, so it must never be reachable
+    # from the network. debug=False for the same reason (Werkzeug's debug
+    # mode exposes an interactive code-execution console).
+    socketio.run(app, host="127.0.0.1", port=5000, debug=False)

@@ -1,4 +1,5 @@
 import json
+import platform
 from datetime import datetime
 from scapy.all import IP, TCP, UDP, ICMP
 import subprocess
@@ -7,15 +8,23 @@ from log_writer import log_packet, init_db
 # ✅ Initialize database
 init_db()
 
-# 🔒 Block an IP with iptables if not already blocked
+# 🔒 Block an IP with iptables if not already blocked (Linux only)
 def block_ip(ip):
+    if platform.system() != "Linux":
+        print(f"⚠️ IP blocking is only supported on Linux (iptables); skipping block of {ip}.")
+        return
     try:
         # Check if the rule already exists
         subprocess.run(["iptables", "-C", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
     except subprocess.CalledProcessError:
         # If the rule doesn't exist, add it
-        subprocess.run(["iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True)
-        print(f"🔒 Blocked IP: {ip}")
+        try:
+            subprocess.run(["iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True)
+            print(f"🔒 Blocked IP: {ip}")
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            print(f"⚠️ Failed to block IP {ip}: {e}")
+    except FileNotFoundError as e:
+        print(f"⚠️ iptables not found; cannot block IP {ip}: {e}")
 
 # 📜 Load firewall rules from rules.json
 def load_rules():
